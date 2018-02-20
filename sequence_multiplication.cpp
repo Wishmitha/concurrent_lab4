@@ -1,11 +1,12 @@
 #include <iostream>
+#include <chrono>
 
 using namespace std;
 
-void fillMatrix(int n, double *mat_add);
-void printMatrix(int n, double *mat_add);
-void multiplyMatrix(int n, double *mat_add_c, double *mat_add_a, double *mat_add_b);
-void free (int n, double *mat_add);
+double** fillMatrix(int n, bool randomize);
+void printMatrix(int n, double **mat_add);
+void multiplyMatrix(int n, double **mat_c, double **mat_a, double **mat_b);
+void free (int n, double** matrix);
 
 int main() {
 
@@ -14,61 +15,76 @@ int main() {
     cout << "Enter n value : ";
     cin >> n;
 
-    double a[n][n];
-    double b[n][n];
-    double c[n][n];
+    // mat_c = mat_a * mat_b
 
-    fillMatrix(n, (double *)&a);
-    printMatrix(n, (double *)&a);
+    double** mat_a = fillMatrix(n, true);
+    double** mat_b = fillMatrix(n, true);
+    double** mat_c = fillMatrix(n, false);
 
-    fillMatrix(n, (double *)&b);
-    printMatrix(n, (double *)&b);
+    auto start = chrono::steady_clock::now();
 
-    multiplyMatrix(n, (double *)&c, (double *)&a, (double *)&b);
-    printMatrix(n, (double *)&c);
+    multiplyMatrix(n, mat_c, mat_a, mat_b);
 
-/*    free((double *)&a);
-    free((double *)&b);
-    free((double *)&c);*/
+    auto end = chrono::steady_clock::now();
+
+    cout << "Elapesed Time : " << chrono::duration_cast<chrono::milliseconds>(end -start).count() << endl;
+
+    free(n,mat_a);
+    free(n,mat_b);
+    free(n,mat_c);
 
     return 0;
 }
 
-void fillMatrix(int n, double *mat_add){
+double** fillMatrix(int n, bool randomize){
 
-    srand((unsigned)time(nullptr)); // change this to generat
+    double** matrix = new double* [n];
 
     for (int i=0; i<n; i++){
-        for (int j=0; j<n; j++){
-            *(mat_add +j+ n*i) = rand()%5;
+        matrix[i] = new double[n];
+    }
+
+    srand((unsigned)time(nullptr));
+
+    for (int j=0; j<n; j++){
+        for (int k=0; k<n; k++){
+            if(randomize){
+                matrix[j][k] = rand()%10;
+            } else{
+                matrix[j][k] = 0;
+            }
         }
     }
+    return matrix;
 }
 
-void multiplyMatrix(int n, double *mat_add_c, double *mat_add_a, double *mat_add_b){
+void multiplyMatrix(int n, double** mat_c, double** mat_a, double** mat_b){
+
     for(int i = 0; i < n; i++)
         for(int j = 0; j < n; j++){
-            *(mat_add_c +j+ n*i) = 0;
             for(int k = 0; k < n; k++)
-                *(mat_add_c +j+ n*i) += *(mat_add_a + k + n*i) * *(mat_add_b +j+ n*k);
+                mat_c[i][j] += mat_a[i][k] * mat_b[k][j];
         }
+
 }
 
-void printMatrix(int n, double *mat_add){
+void printMatrix(int n, double** matrix){
+
     for (int i=0; i<n; i++){
         cout << endl;
         for (int j=0; j<n; j++){
-            cout << *(mat_add +j+ n*i) << " " ;
+            cout << matrix[i][j] << " ";
         }
     }
+
     cout << endl;
 }
 
+void free (int n, double** matrix) {
 
-void free (int n, double *mat_add){
-    for (int i=0; i<n; i++){
-        for (int j=0; j<n; j++){
-            delete (mat_add +j+ n*i);
-        }
+    for(int i = 0; i < n; i++) {
+        delete [] matrix[i];
     }
+
+    delete [] matrix;
 }
