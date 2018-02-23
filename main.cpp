@@ -1,9 +1,12 @@
 #include <iostream>
 #include <chrono>
+#include <omp.h>
+#include <cmath>
 
 using namespace std;
 
 int n;
+int samples = 2;
 
 /* Since the maximum required space for this lab is 2000, it is allocated initially. If the given n is less than 2000,
  * there will be free space remaining.*/
@@ -25,12 +28,13 @@ void sequentialMultiplication();
 void parallelMultiplication();
 void optimizedMultiplication();
 
+void serialMultiplicationCalculation();
+void parallelMultiplicationCalculation();
+void optimizedMultiplicationCalculation();
+
 void printMatrices();
 
 int main() {
-
-    cout << "Enter n value : ";
-    cin >> n;
 
     char method;
     cout << "Select calculation method (s-sequential/p-parllel/o-optimized) : ";
@@ -38,26 +42,16 @@ int main() {
 
     fillMatrices();
 
-    auto start = chrono::steady_clock::now();
-    auto end = chrono::steady_clock::now();
 
     if(method == 's'){
-        start = chrono::steady_clock::now();
-        sequentialMultiplication();
-        end = chrono::steady_clock::now();
+        serialMultiplicationCalculation();
     } else if(method == 'p'){
-        start = chrono::steady_clock::now();
-        parallelMultiplication();
-        end = chrono::steady_clock::now();
+        parallelMultiplicationCalculation();
     } else{
         transposeMatrix();
         flatMatrices();
-        start = chrono::steady_clock::now();
-        optimizedMultiplication();
-        end = chrono::steady_clock::now();
+        optimizedMultiplicationCalculation();
     }
-
-    cout << "Elapesed Time : " << chrono::duration_cast<chrono::milliseconds>(end -start).count() << endl;
 
     return 0;
 }
@@ -219,6 +213,107 @@ void printMatrices(){
 
     cout << endl;
     cout << endl;
+}
+
+void serialMultiplicationCalculation(){
+
+    for (n = 200; n <= 2000; n = n + 200){
+
+        double sample_times[samples];
+
+        double sum = 0;
+
+        for (int i = 0; i < samples; i++){
+            double start = omp_get_wtime();
+            sequentialMultiplication();
+            double end = omp_get_wtime();
+
+            sample_times[i] = end - start;
+            sum +=sample_times[i];
+        }
+
+        double average = sum / samples;
+
+        double std = 0;
+
+        for (int j=0; j<samples; j++){
+            std += (sample_times[j] - average)*(sample_times[j] - average);
+        }
+
+        std = sqrt(std/samples);
+
+        cout << "Serial : Average for n = " << n << " : " << average;
+        cout << " Serial : Std for n = " << n << " : " << std;
+        cout << endl;
+    }
+}
+
+void parallelMultiplicationCalculation(){
+
+    for (n = 200; n <= 2000; n = n + 200){
+
+        double sample_times[samples];
+
+        double sum = 0;
+
+        for (int i = 0; i < samples; i++){
+            double start = omp_get_wtime();
+            parallelMultiplication();
+            double end = omp_get_wtime();
+
+            sample_times[i] = end - start;
+            sum +=sample_times[i];
+        }
+
+        double average = sum / samples;
+
+        double std = 0;
+
+        for (int j=0; j<samples; j++){
+            std += (sample_times[j] - average)*(sample_times[j] - average);
+        }
+
+        std = sqrt(std/samples);
+
+        cout << "Parallel : Average for n = " << n << " : " << average;
+        cout << " Parallel : Std for n = " << n << " : " << std;
+        cout << endl;
+
+    }
+}
+
+void optimizedMultiplicationCalculation(){
+
+    for (n = 200; n <= 2000; n = n + 200){
+
+        double sample_times[samples];
+
+        double sum = 0;
+
+        for (int i = 0; i < samples; i++){
+            double start = omp_get_wtime();
+            optimizedMultiplication();
+            double end = omp_get_wtime();
+
+            sample_times[i] = end - start;
+            sum +=sample_times[i];
+        }
+
+        double average = sum / samples;
+
+        double std = 0;
+
+        for (int j=0; j<samples; j++){
+            std += (sample_times[j] - average)*(sample_times[j] - average);
+        }
+
+        std = sqrt(std/samples);
+
+        cout << "Optimized : Average for n = " << n << " : " << average;
+        cout << " Optimized : Std for n = " << n << " : " << std;
+        cout << endl;
+
+    }
 }
 
 
