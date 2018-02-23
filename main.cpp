@@ -6,7 +6,7 @@
 using namespace std;
 
 int n;
-int samples = 2;
+int samples = 4;
 
 /* Since the maximum required space for this lab is 2000, it is allocated initially. If the given n is less than 2000,
  * there will be free space remaining.*/
@@ -242,8 +242,11 @@ void serialMultiplicationCalculation(){
 
         std = sqrt(std/samples);
 
+        double req_samples = pow(((100*1.96*std)/(5*average)),2);
+
         cout << "Serial : Average for n = " << n << " : " << average;
         cout << " Serial : Std for n = " << n << " : " << std;
+        cout << " Serial : Required samples for n = " << n << " : " << req_samples;
         cout << endl;
     }
 }
@@ -275,8 +278,11 @@ void parallelMultiplicationCalculation(){
 
         std = sqrt(std/samples);
 
+        double req_samples = pow(((100*1.96*std)/(5*average)),2);
+
         cout << "Parallel : Average for n = " << n << " : " << average;
         cout << " Parallel : Std for n = " << n << " : " << std;
+        cout << " Parallel : Required samples for n = " << n << " : " << req_samples;
         cout << endl;
 
     }
@@ -309,8 +315,11 @@ void optimizedMultiplicationCalculation(){
 
         std = sqrt(std/samples);
 
+        double req_samples = pow(((100*1.96*std)/(5*average)),2);
+
         cout << "Optimized : Average for n = " << n << " : " << average;
         cout << " Optimized : Std for n = " << n << " : " << std;
+        cout << " Optimized : Required samples for n = " << n << " : " << req_samples;
         cout << endl;
 
     }
