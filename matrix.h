@@ -14,7 +14,7 @@ class matrix {
 
         static double** fillMatrix(int n, bool randomize){
 
-            auto ** matrix = new double* [n];
+            auto** matrix = new double* [n];
 
             for (int i=0; i<n; i++){
                 matrix[i] = new double[n];
@@ -32,6 +32,18 @@ class matrix {
                 }
             }
             return matrix;
+        }
+
+        static double** flatMatrix(int n, double** matrix){
+            double* flat_matrix = new double[n*n];
+
+            for(int i=0; i<n; n++){
+                for(int j=0; j<n; j++){
+                    flat_matrix[i*j + j] = matrix[i][j];
+                }
+            }
+
+            return &flat_matrix;
         }
 
         static void multiplyMatrixSequential(int n, double** mat_c, double** mat_a, double** mat_b){
